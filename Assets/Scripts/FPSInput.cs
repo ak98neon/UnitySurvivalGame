@@ -82,9 +82,9 @@ public class FPSInput : MonoBehaviour {
         }
     }
 
-    public void charControllerMove(Vector3 napravlenie)
+    public void charControllerMove(Vector3 direction)
     {
-        movement = napravlenie;
+        movement = direction;
         movement = Vector3.ClampMagnitude(movement, speed);
         movement *= speed;
         movement.y = -gravity;

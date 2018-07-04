@@ -13,8 +13,8 @@ public class MouseLook : MonoBehaviour
     public RotationAxes axes = RotationAxes.MouseXAndY;
     public float sensitivityHor = 3.0f;
     public float sensitivityVert = 3.0f;
-    public float minimumVert = -45.0f;
-    public float maximumVert = 45.0f;
+    private float minimumVert = -25.0f; //Up
+    private float maximumVert = 25.0f; //Down
     private float _rotationX = 0;
 
     void Start()

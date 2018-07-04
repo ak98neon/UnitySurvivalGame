@@ -3,7 +3,7 @@ using System.Collections;
 
 public class CamAndStena : MonoBehaviour {
 
-    private Camera mainCamera;
+    public Camera mainCamera;
     private Vector3 spawnCam;
 
     public bool StenaLive = false;

@@ -9,7 +9,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{1C333627-7643-0B1F-705B-A5D12BD20EB3}</ProjectGuid>
+    <ProjectGuid>{5D13C4B6-68D2-9155-CFD0-2639C4400016}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp</AssemblyName>
@@ -66,16 +66,17 @@
      <Compile Include="Assets\Scripts\SettingsMenu.cs" />
      <Compile Include="Assets\Scripts\StatusPlayer.cs" />
      <Compile Include="Assets\Scripts\Strelba.cs" />
+     <Compile Include="Assets\Scripts\SwitchGun.cs" />
      <Compile Include="Assets\Scripts\UIController.cs" />
      <Compile Include="Assets\Scripts\UIUpravlenieMenu.cs" />
      <Compile Include="Assets\Scripts\WanderingAI.cs" />
      <None Include="Assets\Models\Day-Night Skyboxes\readme.txt" />
      <None Include="Assets\Models\Day-Night Skyboxes\Textures\Readme for Assigning.txt" />
- <Reference Include="Unity.PackageManagerUI.Editor">
- <HintPath>/Users/mac/Downloads/Shooter_PiuPiu/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
- </Reference>
  <Reference Include="UnityEditor.StandardEvents">
- <HintPath>/Users/mac/Downloads/Shooter_PiuPiu/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
+ <HintPath>/Users/mac/Documents/GitHub/UnitySurvivalGame/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
+ </Reference>
+ <Reference Include="Unity.PackageManagerUI.Editor">
+ <HintPath>/Users/mac/Documents/GitHub/UnitySurvivalGame/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.AIModule">
  <HintPath>/Applications/Unity/Hub/Editor/2018.1.5f1/Unity.app/Contents/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
@@ -311,7 +312,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
-      <Project>{E4C46250-1A68-2A5B-BA77-E28937542676}</Project>      <Name>Assembly-CSharp-firstpass</Name>    </ProjectReference>
+      <Project>{C1577B5F-2C20-48C7-4B99-15EBE061DCB3}</Project>      <Name>Assembly-CSharp-firstpass</Name>    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitySurvivalGame", "Assembly-CSharp-firstpass.csproj", "{C1577B5F-2C20-48C7-4B99-15EBE061DCB3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitySurvivalGame", "Assembly-CSharp.csproj", "{5D13C4B6-68D2-9155-CFD0-2639C4400016}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitySurvivalGame", "Assembly-CSharp-Editor.csproj", "{99B12644-54B4-E494-67E5-76A14F84C276}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C1577B5F-2C20-48C7-4B99-15EBE061DCB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1577B5F-2C20-48C7-4B99-15EBE061DCB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1577B5F-2C20-48C7-4B99-15EBE061DCB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1577B5F-2C20-48C7-4B99-15EBE061DCB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D13C4B6-68D2-9155-CFD0-2639C4400016}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D13C4B6-68D2-9155-CFD0-2639C4400016}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D13C4B6-68D2-9155-CFD0-2639C4400016}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D13C4B6-68D2-9155-CFD0-2639C4400016}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99B12644-54B4-E494-67E5-76A14F84C276}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99B12644-54B4-E494-67E5-76A14F84C276}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99B12644-54B4-E494-67E5-76A14F84C276}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99B12644-54B4-E494-67E5-76A14F84C276}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Assembly-CSharp.csproj
+	EndGlobalSection
+EndGlobal

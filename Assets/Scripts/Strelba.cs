@@ -8,23 +8,23 @@ using UnityEngine;
 using System.Collections;
 
 /// <remarks>
-/// Скрипт стрельба отвечает за стрельбу, перезарядку, и меню настройки
+/// Скрипт отвечает за стрельбу, перезарядку, и меню настройки
 /// </remarks>
 public class Strelba : MonoBehaviour
 {
     #region Variables
-    public enum CurrentWeapon { pistol, rifle } //Состояние оружия(какое сейчас активно в руках у игрока)
+    public enum CurrentWeapon { pistol, rifle }; //Состояние оружия(какое сейчас активно в руках у игрока)
     public CurrentWeapon currentGun;
 
     public enum menuAlive { game = 0, setting = 1 }; //Положение активно ли меню, или нет
     public menuAlive polKursor;
 
-    public Rigidbody bulletPrefab;
+    public GameObject bulletPrefab;
     public Transform rukiPlayer;
-    public float bulletForce = 500000.0f;
+    private float bulletForce = 1000.0f;
 
     public Camera mainCamera; //Главная камера
-    public ParticleSystem iskra; //Эффект искр от попадания
+    public GameObject iskaPrefab;
     public AudioSource audio;
     public AudioClip firePistol; //Звук выстрела
     public AudioClip reloadAudio; //Звук перезарядки(3 сек.)
@@ -50,6 +50,8 @@ public class Strelba : MonoBehaviour
 
     public bool reloadActive = false; //Активность перезарядки
     public float timeReload = 3.0f; //Время перезарядки
+    private float fireRate = 15f;
+    private float nextTimeToFire = 0f;
 
     public Texture2D crossHair;
     private Rect positionCrosshair;
@@ -140,42 +142,32 @@ public class Strelba : MonoBehaviour
     {
         rukiPlayer.rotation = mainCamera.GetComponent<Transform>().rotation;
 
-        if (Input.GetKeyDown(KeyCode.Mouse0) && reloadActive == false && ammoPistol > 0 && polKursor == menuAlive.game && currentGun == CurrentWeapon.pistol)
+        if (Input.GetKeyDown(KeyCode.Mouse0) && reloadActive == false && ammoPistol > 0 && polKursor == menuAlive.game && currentGun == CurrentWeapon.pistol && Time.time >= nextTimeToFire)
         {
+            nextTimeToFire = Time.time + 1f / fireRate;
+
             audio.PlayOneShot(firePistol);
             ammoPistol--;
 
-            Rigidbody playerFire = Instantiate(bulletPrefab, ruki.position, ruki.rotation) as Rigidbody;
-            playerFire.AddForce(ruki.forward * bulletForce);
-            Physics.IgnoreCollision(bulletPrefab.GetComponent<Collider>(), GetComponent<Collider>()); //Игнорируем коллайдер игрока, чтобы игрок не убивал сам себя
-            /*Vector3 point = new Vector3(mainCamera.pixelWidth / 2, mainCamera.pixelHeight / 2, 0);
+            Vector3 point = new Vector3(mainCamera.pixelWidth/2, mainCamera.pixelHeight/2, 0);
             Ray ray = mainCamera.ScreenPointToRay(point);
             RaycastHit hit;
-
-            if (Physics.Raycast(ray, out hit))
-            {
-                GameObject hitObject = hit.transform.gameObject;
-                ReactiveTarget target = hitObject.GetComponent<ReactiveTarget>();
-                StatusPlayer player = hitObject.GetComponent<StatusPlayer>();
-
-                if (target != null)
-                {
-                    target.ReactToHit();
+            
+            if(Physics.Raycast(ray, out hit)) {
+                if (hit.collider) {
+                    StartCoroutine(SphereIndicator(hit.point));
+                    GameObject iskr = Instantiate(iskaPrefab, hit.point, hit.transform.rotation) as GameObject;
+                    iskr.GetComponent<ParticleSystem>().Play();
                 }
-                else
-                {
-                    iskra.transform.position = hit.point;
-                    iskra.Play();
-                    if (player != null)
-                    {
-                        player.hpPlayerDamage(damageHP);
-                    }
-                    else
-                    {
-                        StartCoroutine(SphereIndicator(hit.point));
-                    }
+
+                if (hit.collider.gameObject.GetComponent<StatusPlayer>()) {
+                    hit.collider.gameObject.GetComponent<StatusPlayer>().hpPlayerDamage(damageHP);
                 }
-            }*/
+            }
+
+            //GameObject playerFire = Instantiate(bulletPrefab, ruki.position, ruki.transform.rotation) as GameObject;
+            //playerFire.GetComponent<Rigidbody>().AddForce(transform.forward * bulletForce);
+            //Physics.IgnoreCollision(bulletPrefab.GetComponent<Collider>(), GetComponent<Collider>()); //Игнорируем коллайдер игрока, чтобы игрок не убивал сам себя
         }
     }
 
@@ -184,8 +176,10 @@ public class Strelba : MonoBehaviour
     /// </summary>
     public void FireRifle()
     {
-        if (Input.GetKeyDown(KeyCode.Mouse0) && reloadActive == false && ammoRifle > 0 && polKursor == menuAlive.game && currentGun == CurrentWeapon.rifle)
+        if (Input.GetKey(KeyCode.Mouse0) && reloadActive == false && ammoRifle > 0 && polKursor == menuAlive.game && currentGun == CurrentWeapon.rifle && Time.time >= nextTimeToFire)
         {
+            nextTimeToFire = Time.time + 1f / fireRate;
+
             audio.PlayOneShot(firePistol);
             ammoRifle--;
             int posx = Random.Range(1, 10);
@@ -206,8 +200,8 @@ public class Strelba : MonoBehaviour
                 }
                 else
                 {
-                    iskra.transform.position = hit.point;
-                    iskra.Play();
+                    GameObject iskr = Instantiate(iskaPrefab, hit.point, hit.transform.rotation) as GameObject;
+                    iskr.GetComponent<ParticleSystem>().Play();
                     if (player != null)
                     {
                         player.hpPlayerDamage(damageHP);
