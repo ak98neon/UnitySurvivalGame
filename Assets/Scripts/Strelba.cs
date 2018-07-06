@@ -14,7 +14,7 @@ public class Strelba : MonoBehaviour
 {
     #region Variables
     public enum CurrentWeapon { pistol, rifle }; //Состояние оружия(какое сейчас активно в руках у игрока)
-    public CurrentWeapon currentGun;
+    public CurrentWeapon currentGun = CurrentWeapon.pistol;
 
     public enum menuAlive { game = 0, setting = 1 }; //Положение активно ли меню, или нет
     public menuAlive polKursor;
@@ -74,7 +74,6 @@ public class Strelba : MonoBehaviour
         ammoPistol = spawnCountAmmoPistol;
         ammoRifle = spawnCountAmmoRifle;
 
-        currentGun = CurrentWeapon.pistol;
         polKursor = menuAlive.game;
 
         Cursor.lockState = CursorLockMode.Locked;
@@ -127,11 +126,15 @@ public class Strelba : MonoBehaviour
         if (Input.GetKey(KeyCode.Alpha1))
         {
             currentGun = CurrentWeapon.pistol;
+            GameObject.Find("Rifle").SetActive(false);
+            GameObject.Find("Pistol").SetActive(true);
         }
 
         if (Input.GetKey(KeyCode.Alpha2))
         {
             currentGun = CurrentWeapon.rifle;
+            GameObject.Find("Rifle").SetActive(true);
+            GameObject.Find("Pistol").SetActive(false);
         }
     }
 
