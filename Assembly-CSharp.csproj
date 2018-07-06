@@ -57,8 +57,12 @@
      <Compile Include="Assets\Scripts\Bullets.cs" />
      <Compile Include="Assets\Scripts\CamAndStena.cs" />
      <Compile Include="Assets\Scripts\DestroyBullets.cs" />
+     <Compile Include="Assets\Scripts\DestroyGilza.cs" />
+     <Compile Include="Assets\Scripts\DestroyPorohEffects.cs" />
      <Compile Include="Assets\Scripts\FPSInput.cs" />
      <Compile Include="Assets\Scripts\GameManager\IGameManager.cs" />
+     <Compile Include="Assets\Scripts\GunPistols.cs" />
+     <Compile Include="Assets\Scripts\GunRifle.cs" />
      <Compile Include="Assets\Scripts\MouseLook.cs" />
      <Compile Include="Assets\Scripts\MultipleerTest\ConnectionGUI.cs" />
      <Compile Include="Assets\Scripts\ReactiveTarget.cs" />

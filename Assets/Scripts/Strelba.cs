@@ -6,6 +6,7 @@
 
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 /// <remarks>
 /// Скрипт отвечает за стрельбу, перезарядку, и меню настройки
@@ -13,51 +14,23 @@ using System.Collections;
 public class Strelba : MonoBehaviour
 {
     #region Variables
-    public enum CurrentWeapon { pistol, rifle }; //Состояние оружия(какое сейчас активно в руках у игрока)
-    public CurrentWeapon currentGun = CurrentWeapon.pistol;
-
     public enum menuAlive { game = 0, setting = 1 }; //Положение активно ли меню, или нет
     public menuAlive polKursor;
-
-    public GameObject bulletPrefab;
-    public Transform rukiPlayer;
-    private float bulletForce = 1000.0f;
-
     public Camera mainCamera; //Главная камера
-    public GameObject iskaPrefab;
-    public AudioSource audio;
-    public AudioClip firePistol; //Звук выстрела
-    public AudioClip reloadAudio; //Звук перезарядки(3 сек.)
-
-    [SerializeField]
-    private int damageHP = 1; //Урок от выстрела
-
-    [SerializeField]
-    private int spawnCountAmmoPistol = 8; //Вместимость обоймы в пистолете
-    private int allAmmoPistol = 30; //Кол-во патронов к пистолету, в инвентаре
-    private int ammoPistol = 8; //Кол-во патронов к пистолету в обойме
-
-    [SerializeField]
-    private int spawnCountAmmoRifle = 30; //Вместимость обоймы в автомате
-    private int allAmmoRifle = 90; //Кол-во патронов к автомату, в инвентаре
-    private int ammoRifle = 30; //Кол-во патронов к автомату в обойме
-
-    [SerializeField]
     private int countGrenade = 3; //Кол-во гранат
     public GameObject grenadePrefab; //Префаб гранаты
     public Transform ruki; //Положение места от куда будут кидаться гранаты, тоесть руки игрока
     private float forceGrenade = 500.0f; //Сила броска гранаты
-
-    public bool reloadActive = false; //Активность перезарядки
-    public float timeReload = 3.0f; //Время перезарядки
-    private float fireRate = 15f;
-    private float nextTimeToFire = 0f;
 
     public Texture2D crossHair;
     private Rect positionCrosshair;
 
     //Animation
     private Animator _animator;
+
+    [SerializeField]
+    public GameObject []listGun = new GameObject[3];
+    public GameObject currentGun;
     #endregion
 
     /// <summary>
@@ -69,15 +42,16 @@ public class Strelba : MonoBehaviour
 
         positionCrosshair = new Rect((Screen.width - crossHair.width) / 2, (Screen.height - crossHair.height) / 2, crossHair.width, crossHair.height);
 
-        bulletPrefab.GetComponent<Rigidbody>();
-        
-        ammoPistol = spawnCountAmmoPistol;
-        ammoRifle = spawnCountAmmoRifle;
-
         polKursor = menuAlive.game;
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        if (listGun.Length != 0) {
+            currentGun = listGun[0];
+            listGun[0].SetActive(true);
+            listGun[1].SetActive(false);
+        }
     }
 
     /// <summary>
@@ -85,12 +59,10 @@ public class Strelba : MonoBehaviour
     /// </summary>
     void Update()
     {
+        FireCurrentGun();
+        ReloadCurrentGun();
         activeSettings();
-        vuborGun();
-        FirePistol();
-        FireRifle();
-        useGrenade();
-        reload();
+        switchGun();
     }
 
     /// <summary>
@@ -121,103 +93,107 @@ public class Strelba : MonoBehaviour
     /// <summary>
     /// Switch gun
     /// </summary>
-    public void vuborGun()
+    public void switchGun()
     {
         if (Input.GetKey(KeyCode.Alpha1))
         {
-            currentGun = CurrentWeapon.pistol;
-            GameObject.Find("Rifle").SetActive(false);
-            GameObject.Find("Pistol").SetActive(true);
+            currentGun = listGun[0];
+            listGun[0].SetActive(true); //Pistol
+            listGun[1].SetActive(false); //Rifle
         }
 
         if (Input.GetKey(KeyCode.Alpha2))
         {
-            currentGun = CurrentWeapon.rifle;
-            GameObject.Find("Rifle").SetActive(true);
-            GameObject.Find("Pistol").SetActive(false);
+            currentGun = listGun[1];
+            listGun[0].SetActive(false); //Pistol
+            listGun[1].SetActive(true); //Rifle
+        }
+
+        if (Input.GetKey(KeyCode.Alpha0)) {
+            currentGun = null;
+            for (int i = 0; i < listGun.Length; i++) {
+                listGun[i].SetActive(false); //All guns deactivate
+            }
         }
     }
 
     /// <summary>
     /// Resposible for fire with pistol
     /// </summary>
-    public void FirePistol()
+    public void FireCurrentGun()
     {
-        rukiPlayer.rotation = mainCamera.GetComponent<Transform>().rotation;
-
-        if (Input.GetKeyDown(KeyCode.Mouse0) && reloadActive == false && ammoPistol > 0 && polKursor == menuAlive.game && currentGun == CurrentWeapon.pistol && Time.time >= nextTimeToFire)
+        Debug.Log(currentGun);
+        if (Input.GetKey(KeyCode.Mouse0) && polKursor == menuAlive.game && currentGun != null)
         {
-            nextTimeToFire = Time.time + 1f / fireRate;
-
-            audio.PlayOneShot(firePistol);
-            ammoPistol--;
-
-            Vector3 point = new Vector3(mainCamera.pixelWidth/2, mainCamera.pixelHeight/2, 0);
+            Vector3 point;
+            if (currentGun.GetComponent<GunPistols>()) {
+                point = new Vector3(mainCamera.pixelWidth/2, mainCamera.pixelHeight/2, 0);
+            } else {
+                int posx = Random.Range(1, 10);
+                int posy = Random.Range(1, 10);
+                point = new Vector3(mainCamera.pixelWidth/2, mainCamera.pixelHeight/2 + posx - posy, 0);
+            }
             Ray ray = mainCamera.ScreenPointToRay(point);
             RaycastHit hit;
             
             if(Physics.Raycast(ray, out hit)) {
-                if (hit.collider) {
-                    StartCoroutine(SphereIndicator(hit.point));
-                    GameObject iskr = Instantiate(iskaPrefab, hit.point, hit.transform.rotation) as GameObject;
-                    iskr.GetComponent<ParticleSystem>().Play();
+                Debug.Log("Fire Pistol");
+                if (currentGun.GetComponent<GunPistols>()) {
+                    currentGun.GetComponent<GunPistols>().Fire(hit);
                 }
 
-                if (hit.collider.gameObject.GetComponent<StatusPlayer>()) {
-                    hit.collider.gameObject.GetComponent<StatusPlayer>().hpPlayerDamage(damageHP);
+                if (currentGun.GetComponent<GunRifle>()) {
+                    currentGun.GetComponent<GunRifle>().Fire(hit);
                 }
             }
-
-            //GameObject playerFire = Instantiate(bulletPrefab, ruki.position, ruki.transform.rotation) as GameObject;
-            //playerFire.GetComponent<Rigidbody>().AddForce(transform.forward * bulletForce);
-            //Physics.IgnoreCollision(bulletPrefab.GetComponent<Collider>(), GetComponent<Collider>()); //Игнорируем коллайдер игрока, чтобы игрок не убивал сам себя
         }
     }
 
-    /// <summary>
-    /// Resposible for fire with rifle
-    /// </summary>
-    public void FireRifle()
+    public void ReloadCurrentGun() {
+        if (currentGun != null) {
+            if (currentGun.GetComponent<GunPistols>()) {
+                currentGun.GetComponent<GunPistols>().Reload();
+            }
+
+            if (currentGun.GetComponent<GunRifle>()) {
+                currentGun.GetComponent<GunRifle>().Reload();
+            }
+        }
+    }
+
+    void OnGUI()
     {
-        if (Input.GetKey(KeyCode.Mouse0) && reloadActive == false && ammoRifle > 0 && polKursor == menuAlive.game && currentGun == CurrentWeapon.rifle && Time.time >= nextTimeToFire)
+        if (mainCamera != null)
         {
-            nextTimeToFire = Time.time + 1f / fireRate;
+            GUI.DrawTexture(positionCrosshair, crossHair);
+        }
 
-            audio.PlayOneShot(firePistol);
-            ammoRifle--;
-            int posx = Random.Range(1, 10);
-            int posy = Random.Range(1, 10);
-            Vector3 point = new Vector3(mainCamera.pixelWidth / 2 - posx + posy, mainCamera.pixelHeight / 2 + posx - posy, 0);
-            Ray ray = mainCamera.ScreenPointToRay(point);
-            RaycastHit hit;
+        if (currentGun.GetComponent<GunPistols>())
+        {
+            float currentBullets = currentGun.GetComponent<GunPistols>().getCurrentBullets();
+            float sizeMaxBullets = currentGun.GetComponent<GunPistols>().getMaxBullets();
 
-            if (Physics.Raycast(ray, out hit))
-            {
-                GameObject hitObject = hit.transform.gameObject;
-                ReactiveTarget target = hitObject.GetComponent<ReactiveTarget>();
-                StatusPlayer player = hitObject.GetComponent<StatusPlayer>();
+            GUI.Label(new Rect(5, 30, 120, 30), "Пистолет: [" + currentBullets + "/" + sizeMaxBullets + "]");
 
-                if (target != null)
-                {
-                    target.ReactToHit();
-                }
-                else
-                {
-                    GameObject iskr = Instantiate(iskaPrefab, hit.point, hit.transform.rotation) as GameObject;
-                    iskr.GetComponent<ParticleSystem>().Play();
-                    if (player != null)
-                    {
-                        player.hpPlayerDamage(damageHP);
-                    }
-                    else
-                    {
-                        StartCoroutine(SphereIndicator(hit.point));
-                    }
-                }
+            if (currentBullets == 0) {
+                GUI.Label(new Rect(mainCamera.pixelWidth / 2, mainCamera.pixelHeight / 2 + 200, 150, 30), "Перезарядите [R]");
+            }
+        }
+        
+        if (currentGun.GetComponent<GunRifle>())
+        {
+            float currentBullets = currentGun.GetComponent<GunRifle>().getCurrentBullets();
+            float sizeMaxBullets = currentGun.GetComponent<GunRifle>().getMaxBullets();
+
+            GUI.Label(new Rect(5, 30, 120, 30), "Автомат: [" + currentBullets + "/" + sizeMaxBullets + "]");
+
+            if (currentBullets == 0) {
+                GUI.Label(new Rect(mainCamera.pixelWidth / 2, mainCamera.pixelHeight / 2 + 200, 150, 30), "Перезарядите [R]");
             }
         }
     }
-
+}
+    /*
     /// <summary>
     /// Resposible for throw grenades
     /// </summary>
@@ -233,94 +209,4 @@ public class Strelba : MonoBehaviour
             }
         }
     }
-
-    /// <summary>
-    /// Resposible for reload weapons
-    /// </summary>
-    public void reload()
-    {
-        if (Input.GetKeyDown(KeyCode.R) && currentGun == CurrentWeapon.pistol && ammoPistol != spawnCountAmmoPistol && allAmmoPistol > 0)
-        {
-            audio.PlayOneShot(reloadAudio);
-            reloadActive = true;
-            StartCoroutine(Time_reload());
-            allAmmoPistol += ammoPistol;
-
-            if (allAmmoPistol == spawnCountAmmoPistol)
-            {
-                ammoPistol = allAmmoPistol;
-            }
-            else if (allAmmoPistol > spawnCountAmmoPistol)
-            {
-                ammoPistol = spawnCountAmmoPistol;
-                allAmmoPistol -= spawnCountAmmoPistol;
-            }
-            else if (allAmmoPistol < spawnCountAmmoPistol)
-            {
-                ammoPistol = allAmmoPistol;
-                allAmmoPistol = 0;
-            }
-        }
-
-        if (Input.GetKeyDown(KeyCode.R) && currentGun == CurrentWeapon.rifle && ammoRifle != spawnCountAmmoRifle && allAmmoRifle > 0)
-        {
-            audio.PlayOneShot(reloadAudio);
-            reloadActive = true;
-            StartCoroutine(Time_reload());
-            allAmmoRifle += ammoRifle;
-
-            if (allAmmoRifle == spawnCountAmmoRifle)
-            {
-                ammoRifle = allAmmoRifle;
-            } else if (allAmmoRifle > spawnCountAmmoRifle)
-            {
-                ammoRifle = spawnCountAmmoRifle;
-                allAmmoRifle -= spawnCountAmmoRifle;
-            } else if (allAmmoRifle < spawnCountAmmoRifle)
-            {
-                ammoRifle = allAmmoRifle;
-                allAmmoRifle = 0;
-            }
-        }
-    }
-
-    public IEnumerator Time_reload()
-    {
-        yield return new WaitForSeconds(timeReload);
-        reloadActive = false;
-    }
-
-    private IEnumerator SphereIndicator(Vector3 pos)
-    {
-        GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        sphere.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-        sphere.transform.position = pos;
-
-        yield return new WaitForSeconds(1);
-
-        Destroy(sphere);
-    }
-
-    void OnGUI()
-    {
-        if (mainCamera != null)
-        {
-            GUI.DrawTexture(positionCrosshair, crossHair);
-        }
-
-        if (currentGun == CurrentWeapon.pistol)
-        {
-            GUI.Label(new Rect(5, 30, 100, 30), "Пистолет: [" + ammoPistol + "/" + allAmmoPistol + "]");
-        } else if (currentGun == CurrentWeapon.rifle)
-        {
-            GUI.Label(new Rect(5, 30, 120, 30), "Автомат: [" + ammoRifle + "/" + allAmmoRifle + "]");
-        }
-
-        if (ammoPistol == 0 && allAmmoPistol > 0 && currentGun == CurrentWeapon.pistol) {
-            GUI.Label(new Rect(mainCamera.pixelWidth / 2, mainCamera.pixelHeight / 2 + 200, 150, 30), "Перезарядите [R]");
-        } else if (ammoRifle == 0 && allAmmoRifle > 0 && currentGun == CurrentWeapon.rifle)
-        {
-            GUI.Label(new Rect(mainCamera.pixelWidth / 2, mainCamera.pixelHeight / 2 + 200, 150, 30), "Перезарядите [R]");
-        }
-    }
-}
+    */
